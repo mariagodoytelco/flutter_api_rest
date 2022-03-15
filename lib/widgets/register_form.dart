@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
 import '../data/authentication_client.dart';
-import '../pages/home_page.dart';
+import '../pages/home.dart';
 import '../api/authentication_api.dart';
 import '../utils/dialogs.dart';
 import '../utils/responsive.dart';
@@ -138,7 +138,7 @@ class _RegisterFormState extends State<RegisterForm> {
       if (response.data != null) {
         await _authenticationClient.saveSession(response.data!);
         Navigator.pushNamedAndRemoveUntil(
-            context, HomePage.routeName, (_) => false);
+            context, Home.routeName, (_) => false);
       } else {
         String message = response.error!.message;
 
