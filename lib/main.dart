@@ -24,17 +24,15 @@ class MyApp extends StatelessWidget {
 
     return MultiBlocProvider(
         providers: [
-          BlocProvider(
+          BlocProvider<UserBloc>(
             create: (context) => UserBloc(),
           )
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
-          home: const SplashPage(),
+          initialRoute: '/',
           routes: {
-            RegisterPage.routeName: (context) => const RegisterPage(),
-            LoginPage.routeName: (_) => const LoginPage(),
-            Home.routeName: (_) => const Home()
+            '/' :(context) => const SplashPage()
           },
         ));
   }

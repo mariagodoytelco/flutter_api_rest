@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_api_rest/bloc/user_bloc.dart';
-import 'package:flutter_api_rest/bloc/user_event.dart';
-import 'package:flutter_api_rest/bloc/user_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../bloc/user_bloc.dart';
+import '../bloc/user_event.dart';
+import '../bloc/user_state.dart';
 
 import '../utils/dialogs.dart';
 import '../pages/home.dart';
@@ -24,50 +25,54 @@ class _LoginFormState extends State<LoginForm> {
   Widget build(BuildContext context) {
     final Responsive responsive = Responsive(context);
 
-    return BlocListener<UserBloc, UserState>(listener: (context, state) {
-      if (state.error == null && state.conectado) {
-        Navigator.pushNamedAndRemoveUntil(
-            context, Home.routeName, (_) => false);
-      } if(state.error != null && !state.conectado){
-        String message = 'error';
-        int status = state.error!;
+    return BlocBuilder<UserBloc, UserState>(builder: (context, state) {
+      return BlocListener<UserBloc, UserState>(
+        listener: (context, state) {
+          if (!state.loading && state.success) {
+            Navigator.pop(context);
+            Navigator.push(
+              context, MaterialPageRoute(builder: (context) => const Home()));
+           
+          }
+          if (state.error != null && !state.conectado) {
+            String message = 'error';
+            int status = state.error!;
 
-        if (status == -1) {
-          message = 'Bad Network.';
-        } else if (status == 403) {
-          message = 'Invalid password.';
-        } else if (status == 404) {
-          message = 'User not found.';
-        }
+            if (status == -1) {
+              message = 'Bad Network.';
+            } else if (status == 403) {
+              message = 'Invalid password.';
+            } else if (status == 404) {
+              message = 'User not found.';
+            }
 
-        Dialogs.alert(context, title: 'ERROR', description: message);
-
-      }
-    }, 
-    child: BlocBuilder<UserBloc, UserState>(builder: (context, state) {
-      return Positioned(
-        bottom: 30,
-        child: Container(
-          constraints:
-              BoxConstraints(maxWidth: responsive.isTablet ? 430 : 360),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                _inputEmail(responsive),
-                SizedBox(height: responsive.dp(2)),
-                _inputPassword(responsive),
-                SizedBox(height: responsive.dp(5)),
-                _buttonLogin(responsive),
-                SizedBox(height: responsive.dp(3)),
-                _buttonRegister(responsive),
-                SizedBox(height: responsive.dp(10)),
-              ],
+            Dialogs.alert(context, title: 'ERROR', description: message);
+          }
+        },
+        child: Positioned(
+          bottom: 30,
+          child: Container(
+            constraints:
+                BoxConstraints(maxWidth: responsive.isTablet ? 430 : 360),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  _inputEmail(responsive),
+                  SizedBox(height: responsive.dp(2)),
+                  _inputPassword(responsive),
+                  SizedBox(height: responsive.dp(5)),
+                  _buttonLogin(responsive),
+                  SizedBox(height: responsive.dp(3)),
+                  _buttonRegister(responsive),
+                  SizedBox(height: responsive.dp(10)),
+                ],
+              ),
             ),
           ),
         ),
       );
-    }));
+    });
   }
 
   Row _buttonRegister(Responsive responsive) {
@@ -86,7 +91,7 @@ class _LoginFormState extends State<LoginForm> {
     return SizedBox(
         width: double.infinity,
         child: TextButton(
-            onPressed:_submit,
+            onPressed: _submit,
             child: Text('Sign in',
                 style: TextStyle(
                     color: Colors.white, fontSize: responsive.dp(1.5))),
@@ -144,12 +149,25 @@ class _LoginFormState extends State<LoginForm> {
   }
 
   _submit() async {
+    
     if (_formKey.currentState!.validate()) {
-      ProgressDialog.show(context);
-      context.read<UserBloc>().add(IniciarSesionUsuario(_email, _pass));   
-      ProgressDialog.dismiss(context);
-      Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const Home()));
+      if (_email == '' || _pass == '') {
+        const snackBar = SnackBar(
+          backgroundColor: Colors.red,
+          content: Text(
+            'Debe completar todos los campos.',
+            textAlign: TextAlign.justify,
+          ),
+        );
+
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      } else {
+        ProgressDialog.show(context);
+        BlocProvider.of<UserBloc>(context)
+            .add(IniciarSesionUsuario(_email, _pass)); 
+        ProgressDialog.dismiss(context);
+      }
     }
+   
   }
 }

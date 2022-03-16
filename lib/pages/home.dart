@@ -55,13 +55,13 @@ class _HomeState extends State<Home> {
                   const SizedBox(height: 300),
                   if (state.id != '')
                     TextButton(
-                        onPressed: _pickImage(context),
+                        onPressed: _pickImage,
                         child: const Text('Update Avatar',
                             style: TextStyle(color: Colors.white)),
                         style:
                             TextButton.styleFrom(backgroundColor: Colors.pink)),
                   TextButton(
-                      onPressed: _signOut(context),
+                      onPressed: _signOut,
                       child: const Text('Sign Out',
                           style: TextStyle(color: Colors.white)),
                       style: TextButton.styleFrom(
@@ -71,13 +71,14 @@ class _HomeState extends State<Home> {
     );
   }
 
-  _signOut(BuildContext context) async {
-    context.read<UserBloc>().add(const CerrarSesionUsuario());
-    Navigator.pushNamedAndRemoveUntil(
-        context, LoginPage.routeName, (route) => false);
+  _signOut() async {
+    BlocProvider.of<UserBloc>(context).add(const CerrarSesionUsuario());
+    Navigator.pop(context);
+    Navigator.push(
+      context, MaterialPageRoute(builder: (context) => const LoginPage()));
   }
 
-  _pickImage(BuildContext context) async {
+  _pickImage() async {
     final ImagePicker imagePicker = ImagePicker();
 
     final XFile imageFile =

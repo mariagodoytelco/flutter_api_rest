@@ -9,28 +9,34 @@ class UserState extends Equatable {
   final String? avatar;
   final bool conectado;
   final int? error;
+  final bool success;
+  final bool loading;
+  
+  const UserState({
+    required this.id,
+    required this.username,
+    required this.email,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.avatar,
+    this.conectado = false,
+    this.error,
+    required this.success,
+    required this.loading
+  });
 
-  const UserState(
-      {required this.id,
-      required this.username,
-      required this.email,
-      required this.createdAt,
-      required this.updatedAt,
-      required this.avatar,
-      this.conectado = false, 
-      this.error,
-      });
-
-  UserState copyWith(
-          {String? id,
-          String? username,
-          String? email,
-          DateTime? createdAt,
-          DateTime? updatedAt,
-          String? avatar,
-          bool? conectado,
-          int? error,
-          }) =>
+  UserState copyWith({
+    String? id,
+    String? username,
+    String? email,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    String? avatar,
+    bool? conectado,
+    int? error,
+    bool? success,
+    bool? loading
+  }) =>
       UserState(
           id: id ?? this.id,
           username: username ?? this.username,
@@ -39,9 +45,11 @@ class UserState extends Equatable {
           updatedAt: updatedAt ?? this.updatedAt,
           avatar: avatar ?? this.avatar,
           conectado: conectado ?? this.conectado,
-          error: error ?? this.error);
+          error: error ?? this.error,
+          success: success ?? this.success,
+          loading: loading ?? this.loading);
 
   @override
   List<Object?> get props =>
-      [id, username, email, createdAt, updatedAt, avatar, conectado, error];
+      [id, username, email, createdAt, updatedAt, avatar, conectado, error, success, loading];
 }

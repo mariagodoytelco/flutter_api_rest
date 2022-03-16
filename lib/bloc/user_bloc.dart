@@ -20,17 +20,27 @@ class UserBloc extends Bloc<UserEvent, UserState> {
             email: '',
             createdAt: null,
             updatedAt: null,
-            avatar: '')) {
+            avatar: '',
+            error: null,
+            conectado: false,
+            success: false,
+            loading: false)) {
     on<ObtenerInformacionUsuarioEvent>((event, emit) async {
+      emit(state.copyWith(loading: true));
       final response = await accountAPI.getUserInfo();
-      emit(state.copyWith(
-          id: response.id,
-          username: response.username,
-          email: response.email,
-          createdAt: response.createdAt,
-          updatedAt: response.updatedAt,
-          conectado: true, 
-          error: null));
+      if (response.data != null) {
+        emit(state.copyWith(
+            id: response.data!.id,
+            username: response.data!.username,
+            email: response.data!.email,
+            createdAt: response.data!.createdAt,
+            updatedAt: response.data!.updatedAt,
+            conectado: true,
+            loading: false,
+            success: true));
+      } else {
+        emit(state.copyWith(loading: false, error: response.error!.statusCode, success: false));
+      }
     });
 
     on<ActualizarImagenUsuario>(((event, emit) async {
@@ -48,6 +58,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
           email: event.email, password: event.pass);
       if (response.data != null) {
         await authenticationClient.saveSession(response.data!);
+
         state.copyWith(conectado: true, error: null);
       } else {
         state.copyWith(conectado: false, error: response.error!.statusCode);
